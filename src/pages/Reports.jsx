@@ -9,6 +9,8 @@ import {
   Loader2
 } from 'lucide-react';
 import axios from 'axios';
+// Remove jsPDF import since backend generates PDF for attendance
+// import jsPDF from 'jspdf';
 
 const REPORT_TYPES = [
   {
@@ -47,31 +49,65 @@ export default function Reports() {
     setError(null);
 
     try {
-      const params = new URLSearchParams({
-        startDate: dateRange.start,
-        endDate: dateRange.end,
-        format: 'csv'
-      });
-
-      const response = await axios.get(
-        `http://localhost:5000/api/attendance/export?${params}`,
-        { responseType: 'blob' }
-      );
-
-      // Create download link
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', `${selectedReport.id}_report_${new Date().toISOString()}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
+      if (selectedReport.id === 'attendance' || selectedReport.id === 'members') {
+        const token = localStorage.getItem('eraToken');
+        const params = new URLSearchParams({
+          type: selectedReport.id,
+          format: 'pdf',
+          ...(selectedReport.id === 'attendance' ? {
+            startDate: dateRange.start,
+            endDate: dateRange.end
+          } : {})
+        });
+        const url = `http://localhost:5000/api/admin/reports/export?${params}`;
+        const headers = {
+          ...(token ? { 'Authorization': 'Bearer ' + token } : {}),
+          'Accept': 'application/pdf'
+        };
+        console.log('[PDF Export] Requesting (POST):', url);
+        console.log('[PDF Export] Headers:', headers);
+        const response = await fetch(url, {
+          method: 'POST',
+          headers
+        });
+        console.log('[PDF Export] Response status:', response.status);
+        if (!response.ok) {
+          const text = await response.text();
+          console.error('[PDF Export] Error response body:', text);
+          throw new Error('Failed to generate PDF');
+        }
+        const blob = await response.blob();
+        console.log('[PDF Export] Blob size:', blob.size);
+        const fileUrl = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = fileUrl;
+        a.download = `${selectedReport.id}_report${selectedReport.id === 'attendance' ? `_${dateRange.start}_to_${dateRange.end}` : ''}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(fileUrl);
+      } else {
+        setError('PDF export is only available for Attendance and Members Reports.');
+      }
     } catch (err) {
+      console.error('[PDF Export] Exception:', err);
       setError('Failed to generate report. Please try again.');
     } finally {
       setLoading(false);
     }
   };
+
+  // Helper for duration formatting
+  function formatDuration(checkIn, checkOut) {
+    if (!checkOut) return 'Still present';
+    const durationInMinutes = Math.round((new Date(checkOut) - new Date(checkIn)) / (1000 * 60));
+    if (durationInMinutes < 60) {
+      return `${durationInMinutes}mins`;
+    }
+    const hours = Math.floor(durationInMinutes / 60);
+    const minutes = durationInMinutes % 60;
+    return `${String(hours).padStart(2, '0')}h,${String(minutes).padStart(2, '0')}mins`;
+  }
 
   return (
     <div className="space-y-6">
@@ -192,7 +228,7 @@ export default function Reports() {
             <ul className="mt-4 space-y-3 text-sm text-gray-600">
               <li className="flex items-start">
                 <FileSpreadsheet className="h-5 w-5 text-gray-400 mr-2" />
-                Reports are generated in CSV format
+                Reports are generated in PDF format (Attendance only)
               </li>
               <li className="flex items-start">
                 <Calendar className="h-5 w-5 text-gray-400 mr-2" />
