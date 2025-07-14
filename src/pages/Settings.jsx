@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import axios from 'axios';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { buildApiUrl, API_ENDPOINTS } from '../config/api';
 
 const NOTIFICATION_SETTINGS = [
   {
@@ -93,7 +94,7 @@ export default function Settings() {
   const { data: adminsData, isLoading: isLoadingAdmins } = useQuery({
     queryKey: ['admins'],
     queryFn: async () => {
-      const response = await axios.get('http://localhost:5000/api/auth/admins');
+      const response = await axios.get(buildApiUrl('/auth/admins'));
       return response.data.data.admins;
     },
     enabled: admin?.role === 'superadmin'
@@ -102,7 +103,7 @@ export default function Settings() {
   // Update profile mutation
   const updateProfileMutation = useMutation({
     mutationFn: async (data) => {
-      const response = await axios.put('http://localhost:5000/api/auth/update-me', data);
+      const response = await axios.put(buildApiUrl('/auth/update-me'), data);
       return response.data;
     },
     onSuccess: (data) => {
@@ -117,7 +118,7 @@ export default function Settings() {
   // Change password mutation
   const changePasswordMutation = useMutation({
     mutationFn: async (data) => {
-      const response = await axios.post('http://localhost:5000/api/auth/change-password', data);
+      const response = await axios.post('https://checkin-api-as1t.onrender.com/api/auth/change-password', data);
       return response.data;
     },
     onSuccess: (data) => {
@@ -140,7 +141,7 @@ export default function Settings() {
   // Update admin mutation
   const updateAdminMutation = useMutation({
     mutationFn: async ({ id, data }) => {
-      const response = await axios.put(`http://localhost:5000/api/auth/admins/${id}`, data);
+      const response = await axios.put(`https://checkin-api-as1t.onrender.com/api/auth/admins/${id}`, data);
       return response.data;
     },
     onSuccess: () => {
@@ -153,7 +154,7 @@ export default function Settings() {
   // Delete admin mutation
   const deleteAdminMutation = useMutation({
     mutationFn: async (id) => {
-      const response = await axios.delete(`http://localhost:5000/api/auth/admins/${id}`);
+      const response = await axios.delete(`https://checkin-api-as1t.onrender.com/api/auth/admins/${id}`);
       return response.data;
     },
     onSuccess: () => {
@@ -204,7 +205,7 @@ export default function Settings() {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/register', newAdminForm);
+      const response = await axios.post('https://checkin-api-as1t.onrender.com/api/auth/register', newAdminForm);
       if (response.data.success) {
         setShowAddAdminModal(false);
         setNewAdminForm({

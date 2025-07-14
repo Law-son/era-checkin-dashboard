@@ -17,6 +17,7 @@ import {
   Download
 } from 'lucide-react';
 import MembershipCardModal from '../components/MembershipCardModal';
+import { buildApiUrl, API_ENDPOINTS } from '../config/api';
 
 const MEMBERSHIP_TYPES = ['Student', 'Staff', 'Executive', 'Guest', 'Managing Lead'];
 const DEPARTMENTS = ['ERA OPENLABS', 'ERA Softwares', 'ERA Manufacturing', 'ERA Education', 'None'];
@@ -42,7 +43,7 @@ export default function Members() {
   // Get members without cards mutation
   const getMembersWithoutCardsMutation = useMutation({
     mutationFn: async () => {
-      const response = await axios.get('http://localhost:5000/api/members/without-cards');
+      const response = await axios.get(buildApiUrl('/members/without-cards'));
       return response.data;
     },
     onSuccess: () => {
@@ -160,7 +161,7 @@ export default function Members() {
   // Issue card mutation
   const issueCardMutation = useMutation({
     mutationFn: async (memberId) => {
-      const response = await axios.post(`http://localhost:5000/api/members/card/issue`, {
+      const response = await axios.post(buildApiUrl('/members/card/issue'), {
         memberId
       });
       return response.data;
@@ -174,7 +175,7 @@ export default function Members() {
   const { data: members, isLoading } = useQuery({
     queryKey: ['members', searchQuery],
     queryFn: async () => {
-      const response = await axios.get(`http://localhost:5000/api/admin/search/members?query=${searchQuery}`);
+      const response = await axios.get(`${buildApiUrl(API_ENDPOINTS.SEARCH_MEMBERS)}?query=${searchQuery}`);
       return response.data.data.members;
     }
   });
@@ -182,7 +183,7 @@ export default function Members() {
   // Register member mutation
   const registerMutation = useMutation({
     mutationFn: async (memberData) => {
-      const response = await axios.post('http://localhost:5000/api/members/register', memberData);
+      const response = await axios.post(buildApiUrl(API_ENDPOINTS.MEMBERS + '/register'), memberData);
       return response.data;
     },
     onSuccess: () => {
@@ -194,7 +195,7 @@ export default function Members() {
   // Update member mutation
   const updateMutation = useMutation({
     mutationFn: async (memberData) => {
-      const response = await axios.put(`http://localhost:5000/api/members/${memberData.memberId}`, memberData);
+      const response = await axios.put(buildApiUrl(API_ENDPOINTS.MEMBER_BY_ID(memberData.memberId)), memberData);
       return response.data;
     },
     onSuccess: () => {
@@ -207,7 +208,7 @@ export default function Members() {
   // Delete member mutation
   const deleteMutation = useMutation({
     mutationFn: async (memberId) => {
-      const response = await axios.delete(`http://localhost:5000/api/members/${memberId}`);
+      const response = await axios.delete(buildApiUrl(API_ENDPOINTS.MEMBER_BY_ID(memberId)));
       return response.data;
     },
     onSuccess: () => {

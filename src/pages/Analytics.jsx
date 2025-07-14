@@ -27,6 +27,7 @@ import {
   ChevronLeft,
   ChevronRight
 } from 'lucide-react';
+import { buildApiUrl, API_ENDPOINTS } from '../config/api';
 
 const DEPARTMENT_COLORS = {
   'ERA OPENLABS': '#4338ca',    // Deep indigo
@@ -274,7 +275,7 @@ export default function Analytics() {
       console.log('Fetching analytics with params:', { period, start, end });
       
       const response = await axios.get(
-        `http://localhost:5000/api/admin/reports/analytics?period=${period}&startDate=${start}&endDate=${end}`
+        `${buildApiUrl(API_ENDPOINTS.ANALYTICS)}?period=${period}&startDate=${start}&endDate=${end}`
       );
       
       console.log('Raw API Response:', response.data);
@@ -421,7 +422,7 @@ export default function Analytics() {
     queryKey: ['top-active-members', period],
     queryFn: async () => {
       const response = await axios.get(
-        `http://localhost:5000/api/admin/reports/analytics/top-active?period=${period}&limit=10`
+        `${buildApiUrl(API_ENDPOINTS.TOP_ACTIVE_MEMBERS)}?period=${period}&limit=10`
       );
       return response.data.data.members;
     }
@@ -436,7 +437,7 @@ export default function Analytics() {
     queryKey: ['inactive-members'],
     queryFn: async () => {
       const response = await axios.get(
-        'http://localhost:5000/api/admin/reports/analytics/inactive?days=21'
+        `${buildApiUrl(API_ENDPOINTS.INACTIVE_MEMBERS)}?days=21`
       );
       console.log('Inactive members raw data:', response.data.data.members);
       return response.data.data.members;

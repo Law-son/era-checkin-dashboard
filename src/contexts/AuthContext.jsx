@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
+import { buildApiUrl, API_ENDPOINTS } from '../config/api';
 
 const AuthContext = createContext(null);
 
@@ -40,7 +41,7 @@ export const AuthProvider = ({ children }) => {
 
   const handleLogin = async (email, password) => {
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/login', {
+      const response = await axios.post(buildApiUrl(API_ENDPOINTS.LOGIN), {
         email,
         password,
       });
@@ -62,7 +63,7 @@ export const AuthProvider = ({ children }) => {
 
   const handleRegister = async (email, password, fullName) => {
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/register', {
+      const response = await axios.post(buildApiUrl(API_ENDPOINTS.REGISTER), {
         email,
         password,
         fullName,

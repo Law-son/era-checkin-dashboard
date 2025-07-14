@@ -2,7 +2,7 @@
 
 ## Base URL
 ```
-http://localhost:5000/api
+https://checkin-api-as1t.onrender.com/api
 ```
 
 ## Authentication

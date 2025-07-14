@@ -13,6 +13,7 @@ import {
   Legend,
   Cell,
 } from "recharts";
+import { buildApiUrl, API_ENDPOINTS } from '../config/api';
 
 // Define colors for membership types
 const MEMBERSHIP_COLORS = [
@@ -88,25 +89,23 @@ const StatCard = ({ title, value, icon: Icon, trend }) => (
 );
 
 export default function Overview() {
-  // Fetch current dashboard data
+  // Fetch dashboard data
   const { data: dashboardData, isLoading: isDashboardLoading } = useQuery({
     queryKey: ["dashboard"],
     queryFn: async () => {
       const response = await axios.get(
-        "http://localhost:5000/api/admin/dashboard"
+        buildApiUrl("/admin/dashboard")
       );
       return response.data.data;
     },
   });
 
-  // Fetch last week's dashboard data
+  // Fetch last week's data
   const { data: lastWeekData, isLoading: isLastWeekLoading } = useQuery({
     queryKey: ["dashboard-last-week"],
     queryFn: async () => {
-      const lastWeekDate = new Date();
-      lastWeekDate.setDate(lastWeekDate.getDate() - 7);
       const response = await axios.get(
-        `http://localhost:5000/api/admin/dashboard?date=${lastWeekDate.toISOString()}`
+        buildApiUrl("/admin/dashboard/last-week")
       );
       return response.data.data;
     },
@@ -117,7 +116,7 @@ export default function Overview() {
     queryKey: ["dashboard-today"],
     queryFn: async () => {
       const response = await axios.get(
-        "http://localhost:5000/api/admin/dashboard/today"
+        buildApiUrl("/admin/dashboard/today")
       );
       return response.data.data;
     },

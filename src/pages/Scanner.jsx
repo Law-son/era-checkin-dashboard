@@ -4,6 +4,7 @@ import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import { motion } from 'framer-motion';
 import { CheckCircle, XCircle, Loader2, LogIn, LogOut } from 'lucide-react';
+import { buildApiUrl, API_ENDPOINTS } from '../config/api';
 
 export default function Scanner() {
   const [scanResult, setScanResult] = useState(null);
@@ -26,7 +27,7 @@ export default function Scanner() {
     mutationFn: async (memberId) => {
       try {
         console.log('Making check-in request for memberId:', memberId);
-        const response = await axios.post('http://localhost:5000/api/members/check-in', {
+        const response = await axios.post(buildApiUrl('/members/check-in'), {
           memberId
         });
         console.log('Check-in response:', response.data);
@@ -68,7 +69,7 @@ export default function Scanner() {
     mutationFn: async (memberId) => {
       try {
         console.log('Making check-out request for memberId:', memberId);
-        const response = await axios.post('http://localhost:5000/api/members/check-out', {
+        const response = await axios.post(buildApiUrl('/members/check-out'), {
           memberId
         });
         console.log('Check-out response:', response.data);

@@ -11,6 +11,7 @@ import {
   ChevronRight,
   Loader2
 } from 'lucide-react';
+import { buildApiUrl, API_ENDPOINTS } from '../config/api';
 
 export default function Attendance() {
   const [page, setPage] = useState(1);
@@ -32,7 +33,7 @@ export default function Attendance() {
         ...(dateRange.end && { endDate: dateRange.end })
       });
 
-      const response = await axios.get(`http://localhost:5000/api/attendance?${params}`);
+      const response = await axios.get(`${buildApiUrl(API_ENDPOINTS.ATTENDANCE)}?${params}`);
       return response.data;
     }
   });
@@ -50,7 +51,7 @@ export default function Attendance() {
       });
 
       const response = await axios.get(
-        `http://localhost:5000/api/attendance/export?${params}`,
+        `${buildApiUrl(API_ENDPOINTS.ATTENDANCE_EXPORT)}?${params}`,
         { 
           responseType: 'blob',
           headers: {
